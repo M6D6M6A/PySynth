@@ -1,4 +1,5 @@
 from .base_adsr_parameter import BaseADSRParameter
+from ..curve import CurveType
 
 
 class Release(BaseADSRParameter):
@@ -7,18 +8,20 @@ class Release(BaseADSRParameter):
 
     Attributes:
         value (float): The release time in seconds.
+        curve (CurveType): The curve type for the release time.
     """
 
-    def __init__(self, value: float):
+    def __init__(self, value: float, curve: CurveType = CurveType.LINEAR):
         """
         Initializes the Release object.
 
         Args:
             value (float): The release time in seconds. Should be positive.
+            curve (CurveType): The curve type for the release time.
         """
         if value < 0:
             raise ValueError("Release time must be positive.")
-        super().__init__(value)
+        super().__init__(value, curve)
 
 
 class ReleasePercent(BaseADSRParameter):
@@ -27,18 +30,20 @@ class ReleasePercent(BaseADSRParameter):
 
     Attributes:
         percent (float): The release time as a percentage of the total duration.
+        curve (CurveType): The curve type for the release time.
     """
 
-    def __init__(self, percent: float):
+    def __init__(self, percent: float, curve: CurveType = CurveType.LINEAR):
         """
         Initializes the ReleasePercent object.
 
         Args:
             percent (float): The release time as a percentage of the total duration. Should be between 0 and 100.
+            curve (CurveType): The curve type for the release time.
         """
         if not 0 <= percent <= 100:
             raise ValueError("Release percent must be between 0 and 100.")
-        super().__init__(percent)
+        super().__init__(percent, curve)
 
     def get_value(self, duration: float) -> float:
         """
