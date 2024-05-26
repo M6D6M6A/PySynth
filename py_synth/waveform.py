@@ -37,7 +37,7 @@ class Waveform:
         self.duration = duration
         self.t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
 
-    def generate(self, waveform_type: WaveformType, frequency: float) -> np.ndarray:
+    def generate(self, waveform_type: WaveformType, frequency: float, num_samples: int) -> np.ndarray:
         """
         Generates the specified waveform.
 
@@ -48,18 +48,19 @@ class Waveform:
         Returns:
             np.ndarray: The generated waveform.
         """
+        t = np.linspace(0, num_samples / self.sample_rate, num_samples, endpoint=False)
         if waveform_type == WaveformType.SINE:
-            return self.sine_wave(frequency)
+            return np.sin(2 * np.pi * frequency * t)
         elif waveform_type == WaveformType.SQUARE:
-            return self.square_wave(frequency)
+            return np.sign(np.sin(2 * np.pi * frequency * t))
         elif waveform_type == WaveformType.SAWTOOTH:
-            return self.sawtooth_wave(frequency)
+            return 2 * (t * frequency - np.floor(0.5 + t * frequency))
         elif waveform_type == WaveformType.TRIANGLE:
-            return self.triangle_wave(frequency)
+            return 2 * np.abs(2 * (t * frequency - np.floor(t * frequency + 0.5))) - 1
         elif waveform_type == WaveformType.PULSE:
-            return self.pulse_wave(frequency)
+            return np.where(np.mod(t * frequency, 1) < 0.5, 1.0, -1.0)
         elif waveform_type == WaveformType.NOISE:
-            return self.noise_wave()
+            return np.random.uniform(-1.0, 1.0, len(t))
         else:
             raise ValueError("Unknown waveform type")
 

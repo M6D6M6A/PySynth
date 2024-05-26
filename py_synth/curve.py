@@ -97,7 +97,9 @@ class Curve:
         Returns:
             np.ndarray: The generated exponential curve.
         """
-        return np.linspace(start, end, length) ** 2
+        return start + (end - start) * (np.exp(np.linspace(0, 1, length)) - 1) / (
+            np.e - 1
+        )
 
     def logarithmic_curve(self, length: int, start: float, end: float) -> np.ndarray:
         """
@@ -111,7 +113,9 @@ class Curve:
         Returns:
             np.ndarray: The generated logarithmic curve.
         """
-        return np.logspace(np.log10(max(start, 1e-5)), np.log10(end), length)
+        return start + (end - start) * (np.log(np.linspace(1, np.e, length))) / np.log(
+            np.e
+        )
 
     def sine_curve(self, length: int, start: float, end: float) -> np.ndarray:
         """
@@ -144,7 +148,7 @@ class Curve:
         Returns:
             np.ndarray: The generated quadratic curve.
         """
-        return (end - start) * (np.linspace(0, 1, length) ** 2) + start
+        return start + (end - start) * (np.linspace(0, 1, length) ** 2)
 
     def cubic_curve(self, length: int, start: float, end: float) -> np.ndarray:
         """
@@ -158,7 +162,7 @@ class Curve:
         Returns:
             np.ndarray: The generated cubic curve.
         """
-        return (end - start) * (np.linspace(0, 1, length) ** 3) + start
+        return start + (end - start) * (np.linspace(0, 1, length) ** 3)
 
     def sigmoid_curve(self, length: int, start: float, end: float) -> np.ndarray:
         """
@@ -189,7 +193,7 @@ class Curve:
         Returns:
             np.ndarray: The generated inverse exponential curve.
         """
-        return 1 - np.exp(-np.linspace(0, 5, length))
+        return start + (end - start) * (1 - np.exp(-np.linspace(0, 5, length)))
 
     def tanh_curve(self, length: int, start: float, end: float) -> np.ndarray:
         """

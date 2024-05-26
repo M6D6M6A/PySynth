@@ -19,19 +19,23 @@ class Synthesizer:
     """
 
     _DIR = Path(__file__).resolve().parent
-    _FILES_DIR = _DIR / 'files'
+    _FILES_DIR = _DIR.parent / "files"
 
-    def __init__(self, sample_rate: SampleRate = SampleRate.CD_QUALITY):
+    def __init__(
+        self, sample_rate: SampleRate = SampleRate.CD_QUALITY, show=True, debug=False
+    ):
         """
         Initializes the Synthesizer object with a sample rate.
 
         Args:
             sample_rate (SampleRate): The sample rate in Hz.
         """
+        self.show = show
+        self.debug = debug
         self.sample_rate = sample_rate.value
         self.waveform = Waveform(self.sample_rate)
         self.debugger = None
-        
+
         self._FILES_DIR.mkdir(exist_ok=True, parents=True)
 
     def set_debugger(self, sound: Sound):
@@ -53,17 +57,24 @@ class Synthesizer:
         Args:
             sound (Sound): The sound parameters encapsulated in a Sound object.
         """
-        self.set_debugger(sound)
-        t = np.linspace(
-            0, sound.duration, int(self.sample_rate * sound.duration), endpoint=False
+        if self.debug or self.show:
+            self.set_debugger(sound)
+
+        num_samples = int(self.sample_rate * sound.duration)
+        waveform = self.waveform.generate(
+            sound.waveform_type, sound.frequency.value, num_samples
         )
-        waveform = self.waveform.generate(sound.waveform_type, sound.frequency.value)
         envelope = sound.envelope.generate(self.sample_rate, sound.duration)
         audio = 0.5 * waveform * envelope
-        self.debugger.print_samples(waveform, envelope, audio, sample_rate=100)
+
+        if self.debug:
+            self.debugger.print_samples(waveform, envelope, audio, sample_rate=100)
+
         sd.play(audio, self.sample_rate)
         sd.wait()
-        self.debugger.plot_waveform(waveform, envelope, audio)
+
+        if self.show:
+            self.debugger.plot_waveform(waveform, envelope, audio)
 
     def save_sound(self, sound: Sound, filename: str, file_format: str):
         """
@@ -74,10 +85,10 @@ class Synthesizer:
             filename (str): The name of the file to save the sound.
             file_format (str): The format to save the sound file in (e.g., 'wav', 'flac', 'ogg').
         """
-        t = np.linspace(
-            0, sound.duration, int(self.sample_rate * sound.duration), endpoint=False
+        num_samples = int(self.sample_rate * sound.duration)
+        waveform = self.waveform.generate(
+            sound.waveform_type, sound.frequency.value, num_samples
         )
-        waveform = self.waveform.generate(sound.waveform_type, sound.frequency.value)
         envelope = sound.envelope.generate(self.sample_rate, sound.duration)
         audio = 0.5 * waveform * envelope
 
